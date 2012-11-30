@@ -77,6 +77,8 @@ for i in sorted(result.keys()):
         other += '特等:%s ' % r[7]
     if r[10] != '--':
         other += '高软:%s ' % r[10]
+    if r[16] != '--':
+        other += r[16]
     # 日期,#,车次,发站,到站,出发,到达,历时,软卧,硬卧,软座,硬座,其他,无座,等级
     data += '%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s;' % (
             date, # 日期
@@ -91,7 +93,7 @@ for i in sorted(result.keys()):
             r[12], # 硬卧
             r[13] if r[13] != '--' else r[8], # 软座
             r[14] if r[14] != '--' else r[9], # 硬座
-            other if other else '' + r[16], # 其他
+            other if other else '--', # 其他
             r[15], # 无座
             getdj(r[0]), # 等级
             )

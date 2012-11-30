@@ -11,6 +11,7 @@ import tempfile
 from station_name import station_name, station_name_rev
 
 today = (datetime.datetime.now() + datetime.timedelta(hours=8)).date()
+base = 'http://dynamic.12306.cn/otsquery/query/queryRemanentTicketAction.do?%s'
 
 class TrainQueryError(Exception):
     pass
@@ -34,7 +35,7 @@ class TrainQuery:
             return {}
 
 
-        r = self.s.get('http://dynamic.12306.cn/otsquery/query/queryRemanentTicketAction.do?method=init')
+        r = self.s.get(base % 'method=init')
         payload = {'orderRequest.train_date': str(self.date),
                    'orderRequest.from_station_telecode': station_name_rev[self.fz],
                    'orderRequest.to_station_telecode': station_name_rev[self.dz],
@@ -44,9 +45,10 @@ class TrainQuery:
                    'includeStudent': '00',
                    'seatTypeAndNum': '',
                    'orderRequest.start_time_str': '00:00--24:00',}
-        headers = {'Referer': 'http://dynamic.12306.cn/otsquery/query/queryRemanentTicketAction.do?method=init',
+        headers = {'Referer': base % 'method=init',
                    'X-Requested-With': 'XMLHttpRequest',}
-        r = self.s.get('http://dynamic.12306.cn/otsquery/query/queryRemanentTicketAction.do?method=queryLeftTicket', params=payload, headers=headers)
+        r = self.s.get(base % 'method=queryLeftTicket',
+                       params=payload, headers=headers)
         t = r.json['datas'].encode('utf-8')
 
         result = {}
@@ -55,7 +57,8 @@ class TrainQuery:
             text = re.sub(r'<.+?>', '', line).replace('&nbsp;', '')
             text = re.sub(r',无(?=,)', ',0', text).split(',')
             try:
-                text = text[:2] + [text[2][:-5]] + [text[3][:-5]] + [text[2][-5:]] + [text[3][-5:]] + text[4:]
+                text = text[:2] + [text[2][:-5]] + [text[3][:-5]] + \
+                       [text[2][-5:]] + [text[3][-5:]] + text[4:]
             except IndexError:
                 continue # TODO: why?
 
