@@ -8,6 +8,32 @@ import traceback
 from datetime import date
 from trainquery import TrainQuery
 
+def getdj(traincode):
+    char = traincode[0]
+    if char == 'G':
+        return '高速'
+    elif char == 'C':
+        return '城际'
+    elif char == 'D':
+        return '动车'
+    elif char == 'Z':
+        return '直达'
+    elif char == 'T':
+        return '特快'
+    elif char == 'K':
+        return '快速'
+    elif char == 'Y':
+        return '旅游'
+    elif char == 'L':
+        return '临客'
+    elif char >= '1' and char <= '5':
+        return '普快'
+    elif char >= '6' and char <= '8':
+        return '普客'
+    else:
+        return '--'
+
+
 form = cgi.FieldStorage()
 
 fz = form.getvalue('fz')
@@ -32,7 +58,7 @@ if os.getenv('REQUEST_METHOD') == 'HEAD':
     exit()
 
 try:
-    tq = TrainQuery(fz, dz, month=month, day=day, traincode=train)
+    tq = TrainQuery(fz, dz, year=year, month=month, day=day, traincode=train)
     result = tq.query()
 except Exception:
     print 'Status: 500 Internal Server Error'
@@ -64,9 +90,9 @@ for i in sorted(result.keys()):
             r[12], # 硬卧
             r[13] if r[13] != '--' else r[8], # 软座
             r[14] if r[14] != '--' else r[9], # 硬座
-            other if other else '--', # 其他
+            other if other else '' + r[16], # 其他
             r[15], # 无座
-            r[16], # 等级
+            getdj(r[0]), # 等级
             )
 data = data[:-1]
 
