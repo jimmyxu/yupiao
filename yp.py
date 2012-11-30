@@ -2,10 +2,10 @@
 # vim: set fileencoding=utf-8:
 
 import cgi
+import datetime
 import json
 import os
 import traceback
-from datetime import date
 from trainquery import TrainQuery
 
 def getdj(traincode):
@@ -39,10 +39,11 @@ form = cgi.FieldStorage()
 fz = form.getvalue('fz')
 dz = form.getvalue('dz')
 train = form.getvalue('train', '')
-date = form.getvalue('date', str(date.today()))
+date = form.getvalue('date', str(datetime.date.today()))
 jsoncallback = form.getvalue('jsoncallback')
 
-year, month, day = date.split('-')
+year, month, day = [int(s) for s in date.split('-')]
+date = datetime.date(year, month, day)
 
 print 'Content-Type: application/javascript; charset=utf-8'
 print 'Cache-Control: private'
@@ -58,7 +59,7 @@ if os.getenv('REQUEST_METHOD') == 'HEAD':
     exit()
 
 try:
-    tq = TrainQuery(fz, dz, year=year, month=month, day=day, traincode=train)
+    tq = TrainQuery(fz, dz, traincode=train, date=date)
     result = tq.query()
 except Exception:
     print 'Status: 500 Internal Server Error'
