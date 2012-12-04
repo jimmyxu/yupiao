@@ -10,29 +10,18 @@ import traceback
 from trainquery import TrainQuery
 
 def getdj(traincode):
-    char = traincode[0]
-    if char == 'G':
-        return '高速'
-    elif char == 'C':
-        return '城际'
-    elif char == 'D':
-        return '动车'
-    elif char == 'Z':
-        return '直达'
-    elif char == 'T':
-        return '特快'
-    elif char == 'K':
-        return '快速'
-    elif char == 'Y':
-        return '旅游'
-    elif char == 'L':
-        return '临客'
-    elif char >= '1' and char <= '5':
-        return '普快'
-    elif char >= '6' and char <= '8':
-        return '普客'
-    else:
-        return '--'
+    dj = {'G': '高速',
+          'C': '城际',
+          'D': '动车',
+          'Z': '直达',
+          'T': '特快',
+          'K': '快速',
+          'Y': '旅游',
+          'L': '临客',}
+    dj.update([(str(i), '普快') for i in xrange(1, 6)])
+    dj.update([(str(i), '普客') for i in xrange(6, 9)])
+
+    return dj.get(traincode[0], '--')
 
 
 form = cgi.FieldStorage()
