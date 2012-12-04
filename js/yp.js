@@ -118,7 +118,7 @@ var YP = window.YP = YP || {};
 		});
 	}
 
-	var MAX_SECONDS = 21;
+	var MAX_SECONDS = 12;
 	function singleQuery(FZ, DZ, TC, dt, delta, pos, requery) {
 		var KEY = FZ + "-" + DZ + "-" + TC + "/" + dt;
         try{

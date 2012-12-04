@@ -31,7 +31,7 @@ class TrainQuery:
         self.date = date
 
     def query(self):
-        if (self.fz not in station_name.values() and
+        if (self.fz not in station_name.values() or
             self.dz not in station_name.values()):
             return {}
 
