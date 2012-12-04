@@ -3,6 +3,7 @@
 
 import cgi
 import datetime
+import email.header
 import json
 import os
 import traceback
@@ -61,8 +62,8 @@ if os.getenv('REQUEST_METHOD') == 'HEAD':
 try:
     tq = TrainQuery(fz, dz, traincode=train, date=date)
     result = tq.query()
-except Exception:
-    print 'Status: 500 Internal Server Error'
+except Exception, ex:
+    print 'Status: 500 %s' % email.header.Header(ex.message.decode('utf-8')).encode()
     print
     print '/*\n%s */' % traceback.format_exc()
     exit()

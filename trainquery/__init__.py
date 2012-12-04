@@ -58,7 +58,7 @@ class TrainQuery:
         try:
             t = r.json['datas'].encode('utf-8')
         except TypeError:
-            raise TrainQueryError # 上游未返回数据
+            raise TrainQueryError('上游未返回数据')
         if not t:
             return {}
 
