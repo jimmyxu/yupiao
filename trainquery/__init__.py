@@ -59,6 +59,8 @@ class TrainQuery:
             t = r.json['datas'].encode('utf-8')
         except TypeError:
             raise TrainQueryError # 上游未返回数据
+        if not t:
+            return {}
 
         result = {}
         count = 1
@@ -74,11 +76,9 @@ class TrainQuery:
                         trains[text[1]]['start'], trains[text[1]]['end'])
             except KeyError:
                 tq = text[1]
-            try:
-                text = [text[0]] + [tq] + [text[2][:-5]] + [text[3][:-5]] + \
-                       [text[2][-5:]] + [text[3][-5:]] + text[4:]
-            except IndexError:
-                continue # TODO: why?
+
+            text = [text[0]] + [tq] + [text[2][:-5]] + [text[3][:-5]] + \
+                    [text[2][-5:]] + [text[3][-5:]] + text[4:]
 
             if ((self.fztc or station_name[text[2]] == self.fz) and
                 (self.dztc or station_name[text[3]] == self.dz)):
