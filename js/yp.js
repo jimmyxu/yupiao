@@ -90,7 +90,7 @@ var YP = window.YP = YP || {};
 
 	function enumStationQuery() {
 		$.ajax({
-			url : "/~jimmy/yp/api/train/" + TC + "/" + dates[DT],
+            url : "/~jimmy/yp/api/train/" + TC + "/" + dates[DT],
 			dataType : "json",
 			success : function(train) {
 				cur_train = train;
@@ -105,7 +105,7 @@ var YP = window.YP = YP || {};
 					var begini = train.stop[FZ] ? train.stop[FZ].sequence : 0;
 					for(var i = begini; i < train.stops.length; i++) {
 						var pos = $('<div></div>').attr('id', 'result' + i).appendTo($('#query_canvas'));
-						singleQuery(FZ, train.stops[i], train.stop[train.stops[i]].station_traincode, dates[DT], i, pos);
+						singleQuery(FZ, train.stops[i], TC, dates[DT], i, pos);
 					}
 				} else if(!FZ) {
 					var endi = train.stop[DZ] ? train.stop[DZ].sequence - 1 : train.stops.length - 1;
