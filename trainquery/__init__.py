@@ -55,6 +55,8 @@ class TrainQuery:
                    'seatTypeAndNum': '',
                    'orderRequest.start_time_str': '00:00--24:00',}
         r = self.s.get(base % 'method=queryLeftTicket', params=payload)
+        if r.status_code != 200:
+            raise TrainQueryError('上游出错(%d)' % r.status_code)
         try:
             t = r.json['datas'].encode('utf-8')
         except TypeError:
@@ -96,9 +98,10 @@ class TrainQuery:
                    'fromstation': self.fz,
                    'tostation': self.dz,
                    'starttime': '00:00--24:00',}
-        # TODO: switch to base when ready
-        #r = self.s.post(base % 'method=queryststrainall', data=payload)
-        r = self.s.post('https://www.12306.cn/otsweb/order/querySingleAction.do?method=queryststrainall', data=payload, verify=False)
+        try:
+            r = self.s.post(base % 'method=queryststrainall', data=payload)
+        except Exception:
+            return {}
         tj = r.json
         if not tj:
             return {}
@@ -111,7 +114,7 @@ class TrainQuery:
         return trains
 
 if __name__ == '__main__':
-    tq = TrainQuery('XAY', 'SHH', traincode='', date=today + datetime.timedelta(8))
+    tq = TrainQuery('无锡', '上海', traincode='', date=today + datetime.timedelta(8))
     data = tq.query()
     for d in sorted(data.keys()):
         print ('%d\t%s' % (d, str(data[d]))).decode("string_escape")
