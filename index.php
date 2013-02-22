@@ -5,7 +5,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', mktime(0, 0, 0) + 24 * 60 * 60 - 1
 $dates = '';
 $options = '';
 setlocale(LC_TIME, 'zh_CN.UTF-8');
-for ($i = 0; $i <= 12; $i++) {
+for ($i = 0; $i <= 20; $i++) {
     $dates .= date('Y-m-d', time() + $i * 24 * 60 * 60) . ',';
     $selected = $i == @$_GET['D'] ? ' selected' : '';
     $options .= "<option value=$i$selected>" . strftime('%m月%d日 %A', time() + $i * 24 * 60 * 60) . ' ' . ($i == 0 ? '今天' : "+$i") . '</option>';

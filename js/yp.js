@@ -1,3 +1,4 @@
+var DAYS_FORWARD = 20;
 function init() {
 	if(parseInt(!!($('#FZ')[0].value) + !!($('#DZ')[0].value) + !!$('#TC')[0].value) >= 2) {// 会不会导致兼容性问题？
 		YP.doYpQuery();
@@ -43,10 +44,9 @@ var YP = window.YP = YP || {};
 		TC = $('#TC')[0].value;
 		DT = parseInt($('#DATE')[0].value);
 		DAYS = parseInt($('#DAYS')[0].value);
-		if(DAYS + DT > 12)
-			DAYS = 12 - DT;
+		if(DAYS + DT > DAYS_FORWARD)
+			DAYS = DAYS_FORWARD - DT;
 		tableCanvas = $('<div></div>').attr('id', 'table_canvas');
-        //if ($('#readme')[0].innerHTML == '') $('#readme').html($('#result_canvas')[0].innerHTML).show();
 		$('#query_canvas').html("");
 		$('#result_canvas').html("").append(tableCanvas);
 		if(parseInt(!!FZ + !!DZ + !!TC) < 2) {// 会不会导致兼容性问题？
@@ -105,6 +105,7 @@ var YP = window.YP = YP || {};
 					var begini = train.stop[FZ] ? train.stop[FZ].sequence : 0;
 					for(var i = begini; i < train.stops.length; i++) {
 						var pos = $('<div></div>').attr('id', 'result' + i).appendTo($('#query_canvas'));
+						//singleQuery(FZ, train.stops[i], train.stop[train.stops[i]].station_traincode, dates[DT], i, pos); // bugfix@20121218
 						singleQuery(FZ, train.stops[i], TC, dates[DT], i, pos);
 					}
 				} else if(!FZ) {
@@ -118,7 +119,7 @@ var YP = window.YP = YP || {};
 		});
 	}
 
-	var MAX_SECONDS = 12;
+	var MAX_SECONDS = 11;
 	function singleQuery(FZ, DZ, TC, dt, delta, pos, requery) {
 		var KEY = FZ + "-" + DZ + "-" + TC + "/" + dt;
         try{
