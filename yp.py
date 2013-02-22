@@ -7,7 +7,7 @@ import email.header
 import json
 import os
 import traceback
-from trainquery import TrainQuery
+from trainquery import TrainQuery, qssj
 
 def getdj(traincode):
     dj = {'G': '高速',
@@ -23,6 +23,10 @@ def getdj(traincode):
 
     return dj.get(traincode[0], '--')
 
+def getqssj(fz, traincode):
+    if traincode[0] in 'GCD':
+        return 11
+    return qssj.qssj[fz]
 
 form = cgi.FieldStorage()
 
@@ -61,6 +65,10 @@ data = ''
 for i in sorted(result.keys()):
     r = result[i]
     other = ''
+    rz = r[13] if r[13] != '--' else r[8]
+    yz = r[14] if r[14] != '--' else r[9]
+    if '*' in r[11] + r[12] + rz + yz + r[15]:
+        other += '%d点起售 ' % getqssj(r[1], r[0])
     if r[6] != '--':
         other += '商务:%s ' % r[6]
     if r[7] != '--':
@@ -81,8 +89,8 @@ for i in sorted(result.keys()):
             r[5], # 历时
             r[11], # 软卧
             r[12], # 硬卧
-            r[13] if r[13] != '--' else r[8], # 软座
-            r[14] if r[14] != '--' else r[9], # 硬座
+            rz, # 软座
+            yz, # 硬座
             other if other else '--', # 其他
             r[15], # 无座
             getdj(r[0]), # 等级

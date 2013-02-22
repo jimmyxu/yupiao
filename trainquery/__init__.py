@@ -19,15 +19,19 @@ class TrainQueryError(Exception):
 class TrainQuery:
     def __init__(self, fz, dz, traincode='', date=today):
         self.s = requests.session()
-        self.s.config['base_headers']['User-Agent'] = \
-            'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)'
-        self.s.config['base_headers']['Referer'] = base % 'method=init'
-        self.s.config['base_headers']['X-Requested-With'] = 'XMLHttpRequest'
+        self.s.headers.update({'Referer': base % 'method=init',
+                               'X-Requested-With': 'XMLHttpRequest',
+                               'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',})
         telecode = lambda z: (station_name.has_key(z) and
                               (station_name[z], True) or (z.upper(), False))
         self.fz, self.fztc = telecode(fz)
         self.dz, self.dztc = telecode(dz)
-        self.traincode = traincode
+        self.exclude = False
+        if traincode.startswith('-'):
+            self.traincode = traincode.lstrip('-')
+            self.exclude = True
+        else:
+            self.traincode = traincode
         self.date = date
 
     def query(self):
@@ -45,20 +49,23 @@ class TrainQuery:
         #        trainno = trains[self.traincode]['id']
         #    except KeyError:
         #        pass
-        payload = {'orderRequest.train_date': str(self.date),
-                   'orderRequest.from_station_telecode': self.fz,
-                   'orderRequest.to_station_telecode': self.dz,
-                   'orderRequest.train_no': trainno,
-                   'trainPassType': 'QB',
-                   'trainClass': 'QB#D#Z#T#K#QT#',
-                   'includeStudent': '00',
-                   'seatTypeAndNum': '',
-                   'orderRequest.start_time_str': '00:00--24:00',}
+        payload = [('orderRequest.train_date', str(self.date)),
+                   ('orderRequest.from_station_telecode', self.fz),
+                   ('orderRequest.to_station_telecode', self.dz),
+                   ('orderRequest.train_no', trainno),
+                   ('trainPassType', 'QB'),
+                   ('trainClass', 'QB#D#Z#T#K#QT#'),
+                   ('includeStudent', '00'),
+                   ('seatTypeAndNum', ''),
+                   ('orderRequest.start_time_str', '00:00--24:00'),]
         r = self.s.get(base % 'method=queryLeftTicket', params=payload)
+        print r.url
         if r.status_code != 200:
             raise TrainQueryError('上游出错(%d)' % r.status_code)
         try:
-            t = r.json['datas'].encode('utf-8')
+            t = r.json()['datas'].encode('utf-8')
+            if t == '-1':
+                raise TypeError
         except TypeError:
             raise TrainQueryError('上游未返回数据')
         if not t:
@@ -70,8 +77,14 @@ class TrainQuery:
             text = re.sub(r'<.+?>', '', line).replace('&nbsp;', '')
             text = re.sub(r',无(?=,)', ',0', text).split(',')
 
-            if self.traincode and not text[1] == self.traincode:
-                continue
+            try:
+                if self.exclude and text[1][0] in self.traincode:
+                    continue
+                elif self.traincode and not text[1] == self.traincode:
+                    continue
+            except IndexError:
+                print r.json()
+                raise
 
             try:
                 tq = '%s(%s->%s)' % (text[1],
@@ -102,7 +115,7 @@ class TrainQuery:
             r = self.s.post(base % 'method=queryststrainall', data=payload)
         except Exception:
             return {}
-        tj = r.json
+        tj = r.json()
         if not tj:
             return {}
         trains = {}
@@ -114,7 +127,7 @@ class TrainQuery:
         return trains
 
 if __name__ == '__main__':
-    tq = TrainQuery('无锡', '上海', traincode='', date=today + datetime.timedelta(8))
+    tq = TrainQuery('XYY', 'XAY', traincode='1044', date=today + datetime.timedelta(8))
     data = tq.query()
     for d in sorted(data.keys()):
         print ('%d\t%s' % (d, str(data[d]))).decode("string_escape")
