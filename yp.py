@@ -56,7 +56,8 @@ try:
     tq = TrainQuery(fz, dz, traincode=train, date=date)
     result = tq.query()
 except Exception, ex:
-    print 'Status: 500 %s' % email.header.Header(ex.message.decode('utf-8')).encode()
+    print 'Status: 500 %s' % email.header.Header(ex.message).encode()
+    print 'Content-Type: text/plain'
     print
     print '/*\n%s */' % traceback.format_exc()
     exit()
@@ -76,7 +77,7 @@ for i in sorted(result.keys()):
     if r[10] != '--':
         other += '高软:%s ' % r[10]
     if r[16] != '--':
-        other += r[16]
+        other += '其他:%s' % r[16]
     # 日期,#,车次,发站,到站,出发,到达,历时,软卧,硬卧,软座,硬座,其他,无座,等级
     data += '%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s;' % (
             date, # 日期

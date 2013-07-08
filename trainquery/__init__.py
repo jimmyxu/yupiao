@@ -7,6 +7,7 @@ import os
 import random
 import re
 import requests
+import simplejson as json
 import tempfile
 from station_name import station_name
 
@@ -32,6 +33,7 @@ class TrainQuery:
             self.exclude = True
         else:
             self.traincode = traincode
+        self.traincode = self.traincode.upper()
         self.date = date
 
     def query(self):
@@ -41,7 +43,7 @@ class TrainQuery:
 
         r = self.s.get(base % 'method=init')
 
-        trains = self._get_trains()
+        trains = self._get_trains(self.date)
 
         trainno = ''
         #if self.traincode:
@@ -59,7 +61,6 @@ class TrainQuery:
                    ('seatTypeAndNum', ''),
                    ('orderRequest.start_time_str', '00:00--24:00'),]
         r = self.s.get(base % 'method=queryLeftTicket', params=payload)
-        print r.url
         if r.status_code != 200:
             raise TrainQueryError('上游出错(%d)' % r.status_code)
         try:
@@ -75,15 +76,20 @@ class TrainQuery:
         count = 1
         for line in t.split(r'\n'):
             text = re.sub(r'<.+?>', '', line).replace('&nbsp;', '')
+            text = re.sub(r'¥[\d.]+?(?=,)', '', text)
             text = re.sub(r',无(?=,)', ',0', text).split(',')
 
             try:
-                if self.exclude and text[1][0] in self.traincode:
-                    continue
-                elif self.traincode and not text[1] == self.traincode:
-                    continue
+                if self.exclude:
+                    if text[1][0] in self.traincode:
+                        continue
+                elif self.traincode:
+                    if self.traincode.isalpha():
+                        if not text[1][0] in self.traincode:
+                            continue
+                    elif not text[1] == self.traincode:
+                        continue
             except IndexError:
-                print r.json()
                 raise
 
             try:
@@ -102,12 +108,12 @@ class TrainQuery:
 
         return result
 
-    def _get_trains(self):
-        if self.date == today:
-            tmr = self.date + datetime.timedelta(7)
+    def _get_trains(self, date):
+        if date == today:
+            tmr = self._get_trains(date + datetime.timedelta(7))
         else:
-            tmr = self.date
-        payload = {'date': str(tmr),
+            tmr = {}
+        payload = {'date': str(date),
                    'fromstation': self.fz,
                    'tostation': self.dz,
                    'starttime': '00:00--24:00',}
@@ -115,8 +121,11 @@ class TrainQuery:
             r = self.s.post(base % 'method=queryststrainall', data=payload)
         except Exception:
             return {}
-        tj = r.json()
-        if not tj:
+        try:
+            tj = r.json()
+            if not tj:
+                return {}
+        except json.JSONDecodeError:
             return {}
         trains = {}
         for train in tj:
@@ -124,10 +133,11 @@ class TrainQuery:
                 trains[code] = {'start': train['start_station_name'].encode('utf-8'),
                                 'end': train['end_station_name'].encode('utf-8'),
                                 'id': train['id'].encode('utf-8')}
-        return trains
+        tmr.update(trains)
+        return tmr
 
 if __name__ == '__main__':
-    tq = TrainQuery('XYY', 'XAY', traincode='1044', date=today + datetime.timedelta(8))
+    tq = TrainQuery('SHH', 'XAY', traincode='-D', date=today + datetime.timedelta(8))
     data = tq.query()
     for d in sorted(data.keys()):
         print ('%d\t%s' % (d, str(data[d]))).decode("string_escape")
