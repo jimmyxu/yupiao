@@ -27,13 +27,8 @@ class TrainQuery:
                               (station_name[z], True) or (z.upper(), False))
         self.fz, self.fztc = telecode(fz)
         self.dz, self.dztc = telecode(dz)
-        self.exclude = False
-        if traincode.startswith('-'):
-            self.traincode = traincode.lstrip('-')
-            self.exclude = True
-        else:
-            self.traincode = traincode
-        self.traincode = self.traincode.upper()
+        self.traincode = traincode.lstrip('-').upper()
+        self.exclude = traincode.startswith('-')
         self.date = date
 
     def query(self):
