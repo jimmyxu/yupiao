@@ -8,10 +8,17 @@ function init() {
             var c = getCookie('lastYP');
             if(c) {
                 c = c.split('|');
-                if(c.length == 3) {
+                if(c.length == 5) {
                     $('#FZ')[0].value = c[0];
                     $('#DZ')[0].value = c[1];
                     $('#TC')[0].value = c[2];
+                    var date = new Date(c[3]);
+                    var date_forward = new Date();
+                    date_forward.setDate(date_forward.getDate() + DAYS_FORWARD);
+                    if (date >= new Date() && date <= date_forward) {
+                        $('#DATE')[0].value = Math.ceil((date - new Date()) / (1000 * 3600 * 24));
+                    }
+                    $('#DAYS')[0].value = c[4];
                 }
             }
         }
@@ -22,6 +29,20 @@ function init() {
 		$('#DZ')[0].value = 'SHH';
 	}
 	$('#ypquery_submit').bind('click', YP.doYpQuery);
+    // 回车键
+    $('#FZ,#DZ,#TC,#DAYS').keypress(function (e) {
+        var keyCode = e.keyCode ? e.keyCode : e.which ? e.which : e.charCode; 
+        if (keyCode == 13) {
+            YP.doYpQuery();
+        }
+    });
+    /*
+    window.onhashchange = function(e){
+        if (!jsChangingHash){
+            console.info(e);
+            hashProcess();
+        }
+    };*/
 }
 
 var YP = window.YP = YP || {};
@@ -53,7 +74,7 @@ var YP = window.YP = YP || {};
 			alert('查询条件过少，不能查询');
 			return;
 		}
-		setCookie('lastYP', [FZ, DZ, TC].join('|'), 30);
+		setCookie('lastYP', [FZ, DZ, TC, dates[DT], DAYS].join('|'), 30);
 
 		if(FZ && DZ) {
 			queryMode = "normal";
