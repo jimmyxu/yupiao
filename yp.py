@@ -30,9 +30,9 @@ def getqssj(fz, traincode):
 
 form = cgi.FieldStorage()
 
-fz = form.getvalue('fz')
-dz = form.getvalue('dz')
-train = form.getvalue('train', '')
+fz = form.getvalue('fz').strip()
+dz = form.getvalue('dz').strip()
+train = form.getvalue('train', '').strip()
 date = form.getvalue('date', str(datetime.date.today()))
 jsoncallback = form.getvalue('jsoncallback')
 
