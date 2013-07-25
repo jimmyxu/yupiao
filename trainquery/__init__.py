@@ -34,7 +34,7 @@ class TrainQuery:
     def query(self):
         if (self.fz not in station_name.values() or
             self.dz not in station_name.values()):
-            return {}
+            return {0: ['--', self.fz, self.dz] + ['--'] * 12 + ['指定车站不存在于station_name.js', '--', ''],}
 
         r = self.s.get(base % 'method=init')
 
@@ -134,5 +134,6 @@ class TrainQuery:
 if __name__ == '__main__':
     tq = TrainQuery('SHH', 'XAY', traincode='-D', date=today + datetime.timedelta(8))
     data = tq.query()
+    print data
     for d in sorted(data.keys()):
         print ('%d\t%s' % (d, str(data[d]))).decode("string_escape")
