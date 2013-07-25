@@ -56,7 +56,12 @@ try:
     tq = TrainQuery(fz, dz, traincode=train, date=date)
     result = tq.query()
 except Exception, ex:
-    print 'Status: 500 %s' % email.header.Header(str(ex.message)).encode()
+    if isinstance(ex.message, str):
+        message = ex.message.decode('utf-8')
+    else:
+        message = unicode(ex.message)
+    message = email.header.Header(message).encode()
+    print 'Status: 500 %s' % message
     print 'Content-Type: text/plain'
     print
     print '/*\n%s */' % traceback.format_exc()
