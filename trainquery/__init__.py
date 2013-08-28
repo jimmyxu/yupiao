@@ -20,7 +20,8 @@ class TrainQueryError(Exception):
 class TrainQuery:
     def __init__(self, fz, dz, traincode='', date=today):
         self.s = requests.session()
-        self.s.headers.update({'Referer': base % 'method=init',
+        self.s.headers.update({#'Referer': base % 'method=init',
+                               'Referer': 'http://www.12306.cn/otsweb/',
                                'X-Requested-With': 'XMLHttpRequest',
                                'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',})
         telecode = lambda z: (station_name.has_key(z) and
@@ -134,6 +135,5 @@ class TrainQuery:
 if __name__ == '__main__':
     tq = TrainQuery('SHH', 'XAY', traincode='-D', date=today + datetime.timedelta(8))
     data = tq.query()
-    print data
     for d in sorted(data.keys()):
         print ('%d\t%s' % (d, str(data[d]))).decode("string_escape")

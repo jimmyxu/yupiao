@@ -198,7 +198,7 @@ var YP = window.YP = YP || {};
 
 			queryStatus[KEY] = true;
 			seconds = -100;
-			pos.html("");
+			pos.html("<!-- -->");
 
 			var csvlines = [];
 			var lines = data.data.split(';');
