@@ -83,7 +83,7 @@ class TrainQuery:
                     if self.traincode.isalpha():
                         if not text[1][0] in self.traincode:
                             continue
-                    elif not text[1] == self.traincode:
+                    elif not text[1] in self.traincode.split(','):
                         continue
             except IndexError:
                 raise
