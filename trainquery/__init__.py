@@ -9,6 +9,7 @@ import re
 import requests
 import simplejson as json
 import tempfile
+from train_list import train_list
 from station_name import station_name
 
 today = (datetime.datetime.now() + datetime.timedelta(hours=8)).date()
@@ -70,7 +71,7 @@ class TrainQuery:
                     if self.traincode.isalpha():
                         if not data['station_train_code'][0] in self.traincode:
                             continue
-                    elif not data['station_train_code'] in self.traincode.split(','):
+                    elif not data['train_no'] in [train_list[str(self.date)][x] for x in self.traincode.split(',')]:
                         continue
             except IndexError:
                 raise
