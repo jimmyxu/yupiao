@@ -12,11 +12,16 @@ function init() {
                     $('#FZ')[0].value = c[0];
                     $('#DZ')[0].value = c[1];
                     $('#TC')[0].value = c[2];
+                    var today = new Date()
+                    var today = new Date(today - - (today.getTimezoneOffset() + 480) * 60 * 1000);
                     var date = new Date(c[3]);
-                    var date_forward = new Date();
-                    date_forward.setDate(date_forward.getDate() + DAYS_FORWARD);
-                    if (date >= new Date() && date <= date_forward) {
-                        $('#DATE')[0].value = Math.ceil((date - new Date()) / (1000 * 3600 * 24));
+                    date.setHours(today.getHours());
+                    date.setMinutes(today.getMinutes());
+                    date.setSeconds(today.getSeconds());
+                    date.setMilliseconds(today.getMilliseconds());
+                    var diff = Math.ceil((date - today) / (1000 * 3600 * 24));
+                    if (diff >= 0 && diff <= DAYS_FORWARD) {
+                        $('#DATE')[0].value = diff;
                     }
                     $('#DAYS')[0].value = c[4];
                 }
@@ -123,14 +128,14 @@ var YP = window.YP = YP || {};
 					return;
 				}
 				if(!DZ) {
-					var begini = train.stop[FZ] ? train.stop[FZ].sequence : 0;
+					var begini = train.stop[FZ] ? train.stop[FZ].seq : 0;
 					for(var i = begini; i < train.stops.length; i++) {
 						var pos = $('<div></div>').attr('id', 'result' + i).appendTo($('#query_canvas'));
 						//singleQuery(FZ, train.stops[i], train.stop[train.stops[i]].station_traincode, dates[DT], i, pos); // bugfix@20121218
 						singleQuery(FZ, train.stops[i], TC, dates[DT], i, pos);
 					}
 				} else if(!FZ) {
-					var endi = train.stop[DZ] ? train.stop[DZ].sequence - 1 : train.stops.length - 1;
+					var endi = train.stop[DZ] ? train.stop[DZ].seq - 1 : train.stops.length - 1;
 					for(var i = 0; i < endi; i++) {
 						var pos = $('<div></div>').attr('id', 'result' + i).appendTo($('#query_canvas'));
 						singleQuery(train.stops[i], DZ, train.stop[train.stops[i]].station_traincode, dates[DT], i, pos);
@@ -198,7 +203,7 @@ var YP = window.YP = YP || {};
 
 			queryStatus[KEY] = true;
 			seconds = -100;
-			pos.html("<!-- -->");
+			pos.html("");
 
 			var csvlines = [];
 			var lines = data.data.split(';');
