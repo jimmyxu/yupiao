@@ -12,7 +12,10 @@ import tempfile
 from station_name import station_name
 
 today = (datetime.datetime.now() + datetime.timedelta(hours=8)).date()
-base = 'http://dynamic.12306.cn/otsquery/query/queryRemanentTicketAction.do?%s'
+base = 'https://kyfw.12306.cn/otn/lcxxcx/query'
+
+def w(s):
+    return u'0' if s == u'无' else s
 
 class TrainQueryError(Exception):
     pass
@@ -20,10 +23,10 @@ class TrainQueryError(Exception):
 class TrainQuery:
     def __init__(self, fz, dz, traincode='', date=today):
         self.s = requests.session()
-        self.s.headers.update({#'Referer': base % 'method=init',
-                               'Referer': 'http://www.12306.cn/otsweb/',
-                               'X-Requested-With': 'XMLHttpRequest',
-                               'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',})
+        self.s.headers.update({
+            'Referer': 'https://kyfw.12306.cn/otn/lcxxcx/init',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)',})
         telecode = lambda z: (station_name.has_key(z) and
                               (station_name[z], True) or (z.upper(), False))
         self.fz, self.fztc = telecode(fz)
@@ -35,34 +38,22 @@ class TrainQuery:
     def query(self):
         if (self.fz not in station_name.values() or
             self.dz not in station_name.values()):
-            return {0: ['--', self.fz, self.dz] + ['--'] * 12 + ['指定车站不存在于station_name.js', '--', ''],}
+            return {0: [u'--', self.fz.decode('utf-8'), self.dz.decode('utf-8')] + [u'--'] * 12 + [u'指定车站不存在于station_name.js', u'--', u''],}
 
-        r = self.s.get(base % 'method=init')
-
-        trains = self._get_trains(self.date)
+        #r = self.s.get('https://kyfw.12306.cn/otn/leftTicket/init')
 
         trainno = ''
-        #if self.traincode:
-        #    try:
-        #        trainno = trains[self.traincode]['id']
-        #    except KeyError:
-        #        pass
-        payload = [('orderRequest.train_date', str(self.date)),
-                   ('orderRequest.from_station_telecode', self.fz),
-                   ('orderRequest.to_station_telecode', self.dz),
-                   ('orderRequest.train_no', trainno),
-                   ('trainPassType', 'QB'),
-                   ('trainClass', 'QB#D#Z#T#K#QT#'),
-                   ('includeStudent', '00'),
-                   ('seatTypeAndNum', ''),
-                   ('orderRequest.start_time_str', '00:00--24:00'),]
-        r = self.s.get(base % 'method=queryLeftTicket', params=payload)
+        payload = [('purpose_codes', 'ADULT'),
+                   ('queryDate', str(self.date)),
+                   ('from_station', self.fz),
+                   ('to_station', self.dz),]
+        r = self.s.get(base, params=payload)
         if r.status_code != 200:
             raise TrainQueryError('上游出错(%d)' % r.status_code)
         try:
-            t = r.json()['datas'].encode('utf-8')
-            if t == '-1':
+            if r.text == u'-1':
                 raise TypeError
+            t = r.json()['data']['datas']
         except TypeError:
             raise TrainQueryError('上游未返回数据')
         if not t:
@@ -70,67 +61,38 @@ class TrainQuery:
 
         result = {}
         count = 1
-        for line in t.split(r'\n'):
-            text = re.sub(r'<.+?>', '', line).replace('&nbsp;', '')
-            text = re.sub(r'¥[\d.]+?(?=,)', '', text)
-            text = re.sub(r',无(?=,)', ',0', text).split(',')
-
+        for data in t:
             try:
                 if self.exclude:
-                    if text[1][0] in self.traincode:
+                    if data['station_train_code'][0] in self.traincode:
                         continue
                 elif self.traincode:
                     if self.traincode.isalpha():
-                        if not text[1][0] in self.traincode:
+                        if not data['station_train_code'][0] in self.traincode:
                             continue
-                    elif not text[1] in self.traincode.split(','):
+                    elif not data['station_train_code'] in self.traincode.split(','):
                         continue
             except IndexError:
                 raise
 
             try:
-                tq = '%s(%s->%s)' % (text[1],
-                        trains[text[1]]['start'], trains[text[1]]['end'])
+                tq = u'%s(%s->%s)' % (data['station_train_code'],
+                        data['start_station_name'], data['end_station_name'])
             except KeyError:
                 tq = text[1]
 
-            text = [text[0]] + [tq] + [text[2][:-5]] + [text[3][:-5]] + \
-                    [text[2][-5:]] + [text[3][-5:]] + text[4:]
+            text = [count, tq, data['from_station_name'], data['to_station_name'],
+                data['start_time'], data['arrive_time'], data['lishi'],
+                w(data['swz_num']), w(data['tz_num']), w(data['zy_num']), w(data['ze_num']),
+                w(data['gr_num']), w(data['rw_num']), w(data['yw_num']),
+                w(data['rz_num']), w(data['yz_num']), w(data['wz_num']), w(data['qt_num']),]
 
-            if ((self.fztc or station_name[text[2]] == self.fz) and
-                (self.dztc or station_name[text[3]] == self.dz)):
+            if ((self.fztc or data['from_station_telecode'] == self.fz) and
+                (self.dztc or data['to_station_telecode'] == self.dz)):
                 result[count] = text[1:]
                 count += 1
 
         return result
-
-    def _get_trains(self, date):
-        if date == today:
-            tmr = self._get_trains(date + datetime.timedelta(7))
-        else:
-            tmr = {}
-        payload = {'date': str(date),
-                   'fromstation': self.fz,
-                   'tostation': self.dz,
-                   'starttime': '00:00--24:00',}
-        try:
-            r = self.s.post(base % 'method=queryststrainall', data=payload)
-        except Exception:
-            return {}
-        try:
-            tj = r.json()
-            if not tj:
-                return {}
-        except json.JSONDecodeError:
-            return {}
-        trains = {}
-        for train in tj:
-            for code in train['value'].split('/'):
-                trains[code] = {'start': train['start_station_name'].encode('utf-8'),
-                                'end': train['end_station_name'].encode('utf-8'),
-                                'id': train['id'].encode('utf-8')}
-        tmr.update(trains)
-        return tmr
 
 if __name__ == '__main__':
     tq = TrainQuery('SHH', 'XAY', traincode='-D', date=today + datetime.timedelta(8))

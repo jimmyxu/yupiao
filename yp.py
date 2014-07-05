@@ -10,23 +10,26 @@ import traceback
 from trainquery import TrainQuery, qssj
 
 def getdj(traincode):
-    dj = {'G': '高速',
-          'C': '城际',
-          'D': '动车',
-          'Z': '直达',
-          'T': '特快',
-          'K': '快速',
-          'Y': '旅游',
-          'L': '临客',}
-    dj.update([(str(i), '普快') for i in xrange(1, 6)])
-    dj.update([(str(i), '普客') for i in xrange(6, 9)])
+    dj = {u'G': u'高速',
+          u'C': u'城际',
+          u'D': u'动车',
+          u'Z': u'直达',
+          u'T': u'特快',
+          u'K': u'快速',
+          u'Y': u'旅游',
+          u'L': u'临客',}
+    dj.update([(unicode(i), u'普快') for i in xrange(1, 6)])
+    dj.update([(unicode(i), u'普客') for i in xrange(6, 9)])
 
-    return dj.get(traincode[0], '--')
+    return dj.get(traincode[0], u'--')
 
 def getqssj(fz, traincode):
-    if traincode[0] in 'GCD':
+    if traincode[0] in u'GCD':
         return 11
-    return qssj.qssj[fz]
+    try:
+        return qssj.qssj[fz]
+    except KeyError:
+        return -1
 
 form = cgi.FieldStorage()
 
@@ -67,24 +70,24 @@ except Exception, ex:
     print '/*\n%s */' % traceback.format_exc()
     exit()
 
-data = ''
+data = u''
 for i in sorted(result.keys()):
     r = result[i]
-    other = ''
-    rz = r[13] if r[13] != '--' else r[8]
-    yz = r[14] if r[14] != '--' else r[9]
-    if '*' in r[11] + r[12] + rz + yz + r[15]:
-        other += '%d点起售 ' % getqssj(r[1], r[0])
-    if r[6] != '--':
-        other += '商务:%s ' % r[6]
-    if r[7] != '--':
-        other += '特等:%s ' % r[7]
-    if r[10] != '--':
-        other += '高软:%s ' % r[10]
-    if r[16] != '--':
-        other += '其他:%s' % r[16]
+    other = u''
+    rz = r[13] if r[13] != u'--' else r[8]
+    yz = r[14] if r[14] != u'--' else r[9]
+    if u'*' in r[11] + r[12] + rz + yz + r[15]:
+        other += u'%d点起售 ' % getqssj(r[1], r[0])
+    if r[6] != u'--':
+        other += u'商务:%s ' % r[6]
+    if r[7] != u'--':
+        other += u'特等:%s ' % r[7]
+    if r[10] != u'--':
+        other += u'高软:%s ' % r[10]
+    if r[16] != u'--':
+        other += u'其他:%s' % r[16]
     # 日期,#,车次,发站,到站,出发,到达,历时,软卧,硬卧,软座,硬座,其他,无座,等级
-    data += '%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s;' % (
+    data += u'%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s;' % (
             date, # 日期
             i, # #
             r[0], # 车次
@@ -97,11 +100,11 @@ for i in sorted(result.keys()):
             r[12], # 硬卧
             rz, # 软座
             yz, # 硬座
-            other if other else '--', # 其他
+            other if other else u'--', # 其他
             r[15], # 无座
             getdj(r[0]), # 等级
             )
-data = data[:-1]
+data = data[:-1].encode('utf-8')
 
 response = '%s(%s)' % (jsoncallback, json.dumps({'data': data}))
 print 'Content-Length: %d' % len(response)
