@@ -8,7 +8,7 @@ setlocale(LC_TIME, 'zh_CN.UTF-8');
 for ($i = 0; $i <= 20; $i++) {
     $offset = time() + $i * 24 * 60 * 60;
     $dates .= date('Y-m-d', $offset) . ',';
-    if (($i === @$_GET['D']) || (strftime('%m-%d', $offset) === @$_GET['T'])) {
+    if (($i == @$_GET['D']) || (strftime('%m-%d', $offset) === @$_GET['T'])) {
         $selected = ' selected';
     }
     else {
