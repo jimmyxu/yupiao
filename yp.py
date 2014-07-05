@@ -24,12 +24,14 @@ def getdj(traincode):
     return dj.get(traincode[0], u'--')
 
 def getqssj(fz, traincode):
-    if traincode[0] in u'GCD':
-        return 11
+    if traincode[0] in u'CD':
+        return u'11:00'
+    elif traincode[0] in u'G':
+        return u'14:00'
     try:
         return qssj.qssj[fz]
     except KeyError:
-        return -1
+        return u'null'
 
 form = cgi.FieldStorage()
 
@@ -77,7 +79,7 @@ for i in sorted(result.keys()):
     rz = r[13] if r[13] != u'--' else r[8]
     yz = r[14] if r[14] != u'--' else r[9]
     if u'*' in r[11] + r[12] + rz + yz + r[15]:
-        other += u'%d点起售 ' % getqssj(r[1], r[0])
+        other += u'%s起售 ' % getqssj(r[1], r[0])
     if r[6] != u'--':
         other += u'商务:%s ' % r[6]
     if r[7] != u'--':
