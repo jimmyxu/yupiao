@@ -39,7 +39,7 @@ class TrainQuery:
     def query(self):
         if (self.fz not in station_name.values() or
             self.dz not in station_name.values()):
-            return {0: [u'--', self.fz.decode('utf-8'), self.dz.decode('utf-8')] + [u'--'] * 12 + [u'指定车站不存在于station_name.js', u'--', u''],}
+            raise TrainQueryError(u'指定车站不存在于station_name.js')
 
         #r = self.s.get('https://kyfw.12306.cn/otn/leftTicket/init')
 
@@ -50,13 +50,18 @@ class TrainQuery:
                    ('to_station', self.dz),]
         r = self.s.get(base, params=payload)
         if r.status_code != 200:
-            raise TrainQueryError('上游出错(%d)' % r.status_code)
+            raise TrainQueryError(u'上游出错(%d)' % r.status_code)
         try:
             if r.text == u'-1':
                 raise TypeError
             t = r.json()['data']['datas']
         except TypeError:
-            raise TrainQueryError('上游未返回数据')
+            raise TrainQueryError(u'上游未返回数据')
+        except KeyError:
+            if r.json().has_key('data') and r.json()['data'].has_key('message'):
+                raise TrainQueryError(r.json()['data']['message'])
+            else:
+                raise TrainQueryError(u'上游未返回有效内容')
         if not t:
             return {}
 

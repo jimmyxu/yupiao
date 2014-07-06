@@ -7,7 +7,7 @@ import email.header
 import json
 import os
 import traceback
-from trainquery import TrainQuery, qssj
+from trainquery import TrainQuery, TrainQueryError, qssj
 
 def getdj(traincode):
     dj = {u'G': u'高速',
@@ -60,6 +60,8 @@ if os.getenv('REQUEST_METHOD') == 'HEAD':
 try:
     tq = TrainQuery(fz, dz, traincode=train, date=date)
     result = tq.query()
+except TrainQueryError, ex:
+    result = {0: [u'--', fz.decode('utf-8'), dz.decode('utf-8')] + [u'--'] * 12 + [ex.message, u'--', u''],}
 except Exception, ex:
     if isinstance(ex.message, str):
         message = ex.message.decode('utf-8')
