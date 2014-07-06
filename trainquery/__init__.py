@@ -61,8 +61,9 @@ class TrainQuery:
             return {}
 
         result = {}
-        count = 1
+        count = 0
         for data in t:
+            count += 1
             try:
                 if self.exclude:
                     if data['station_train_code'][0] in self.traincode:
@@ -91,7 +92,6 @@ class TrainQuery:
             if ((self.fztc or data['from_station_telecode'] == self.fz) and
                 (self.dztc or data['to_station_telecode'] == self.dz)):
                 result[count] = text[1:]
-                count += 1
 
         return result
 

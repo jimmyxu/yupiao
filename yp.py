@@ -66,7 +66,7 @@ except Exception, ex:
     else:
         message = unicode(ex.message)
     message = email.header.Header(message).encode()
-    print 'Status: 500 %s' % message
+    print 'Status: 500 Internal Server Error'
     print 'Content-Type: text/plain'
     print
     print '/*\n%s */' % traceback.format_exc()
