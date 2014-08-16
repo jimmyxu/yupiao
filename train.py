@@ -51,9 +51,11 @@ t = r.json()['data']['data']
 
 stop = {}
 stops = []
+station_no = 1
 for data in t:
     stops += [data['station_name']]
-    stop[data['station_name']] = {'seq': int(data['station_no'])}
+    stop[data['station_name']] = {'seq': station_no}
+    station_no += 1
 
 train = {'stops': stops, 'stop': stop}
 
