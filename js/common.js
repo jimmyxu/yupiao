@@ -21,7 +21,7 @@ function setCookie(name,value,days) {
         var expires = "; expires="+date.toGMTString();
     }
     else var expires = "";
-    document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=/~jimmy/yp/";
+    document.cookie = name+"="+encodeURIComponent(value)+expires+"; path=.";
 }
 
 function getCookie(name) {

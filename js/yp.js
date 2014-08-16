@@ -116,7 +116,7 @@ var YP = window.YP = YP || {};
 
 	function enumStationQuery() {
 		$.ajax({
-            url : "/~jimmy/yp/api/train/" + TC + "/" + dates[DT],
+            url : "api/train/" + TC + "/" + dates[DT],
 			dataType : "json",
 			success : function(train) {
 				cur_train = train;
@@ -168,7 +168,7 @@ var YP = window.YP = YP || {};
 			requery = 0;
 			queryKeys.push(KEY);
 		}
-		url = "/~jimmy/yp/api/yp/" + encodeURI(KEY) + "?jsoncallback=?";
+		url = "api/yp/" + encodeURI(KEY) + "?jsoncallback=?";
 		//var url = "http://localhost:4007/api/yp/" + KEY + "?jsoncallback=?";
 		var seconds = MAX_SECONDS;
 		var countdown = $('<span></span>');
