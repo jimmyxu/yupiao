@@ -145,7 +145,7 @@ var YP = window.YP = YP || {};
 		});
 	}
 
-	var MAX_SECONDS = 91;
+	var MAX_SECONDS = 121;
 	function singleQuery(FZ, DZ, TC, dt, delta, pos, requery) {
 		var KEY = FZ + "-" + DZ + "-" + TC + "/" + dt;
         try{
@@ -173,6 +173,7 @@ var YP = window.YP = YP || {};
 		var seconds = MAX_SECONDS;
 		var countdown = $('<span></span>');
 		pos.html("正在查询：" + KEY + "").append(countdown);
+                var errmsg = '';
 		var doCountdown = function() {//retry
 			if(queryStatus[KEY]) {
 				//console.debug('stopInternal ' + KEY + "-" + requery + "-" + 'seconds:' + seconds);
@@ -183,7 +184,7 @@ var YP = window.YP = YP || {};
 				// init a new query
 				singleQuery(FZ, DZ, TC, dt, delta, pos, requery + 1);
 			} else if(seconds >= 0) {
-				countdown.html(( requery ? ", 正在重新查询(" + requery +  ")" : "") + ", 请等待" + seconds + "秒...");
+				countdown.html((errmsg ? errmsg : ( requery ? ", 正在重新查询(" + requery +  ")" : "")) + ", 请等待" + seconds + "秒...");
 				setTimeout(doCountdown, 1150)
 			}
 		};
@@ -220,7 +221,10 @@ var YP = window.YP = YP || {};
 			});
 			var csv = csvlines.join('\n');
 			updateResultTable(KEY, csv);
-		})
+		}).fail(function(jqxhr, textStatus, error) {
+                    seconds = 3;
+                    errmsg = ", " + textStatus + ": " + error;
+                });
 	}
 
 	function updateResultTitle(A, B, TC, DT, DAYS){
