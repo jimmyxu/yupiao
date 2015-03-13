@@ -7,10 +7,12 @@ import os
 import random
 import re
 import requests
-import simplejson as json
+import json
 import tempfile
 from train_list import train_list
 from station_name import station_name
+
+requests.packages.urllib3.disable_warnings()
 
 today = (datetime.datetime.now() + datetime.timedelta(hours=8)).date()
 base = 'https://kyfw.12306.cn/otn/lcxxcx/query'
@@ -48,7 +50,7 @@ class TrainQuery:
                    ('queryDate', str(self.date)),
                    ('from_station', self.fz),
                    ('to_station', self.dz),]
-        r = self.s.get(base, params=payload)
+        r = self.s.get(base, params=payload, verify=False)
         if r.status_code != 200:
             raise TrainQueryError(u'上游出错(%d)' % r.status_code)
         try:

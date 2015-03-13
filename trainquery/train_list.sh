@@ -9,4 +9,4 @@ EOF
 
 curl -kvo- -H 'Accept-Encoding: gzip' https://kyfw.12306.cn/otn/resources/js/query/train_list.js | \
     gunzip | \
-    ./train_list.pl
+    $(dirname $0)/train_list.pl
