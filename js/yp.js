@@ -1,4 +1,4 @@
-var DAYS_FORWARD = 20;
+var DAYS_FORWARD = 60;
 function init() {
 	if(parseInt(!!($('#FZ')[0].value) + !!($('#DZ')[0].value) + !!$('#TC')[0].value) >= 2) {// 会不会导致兼容性问题？
 		YP.doYpQuery();
@@ -145,7 +145,7 @@ var YP = window.YP = YP || {};
 		});
 	}
 
-	var MAX_SECONDS = 11;
+	var MAX_SECONDS = 91;
 	function singleQuery(FZ, DZ, TC, dt, delta, pos, requery) {
 		var KEY = FZ + "-" + DZ + "-" + TC + "/" + dt;
         try{
