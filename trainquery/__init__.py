@@ -79,11 +79,12 @@ class TrainQuery:
                     if self.traincode.isalpha():
                         if not data['station_train_code'][0] in self.traincode:
                             continue
-                    try:
-                        if not data['train_no'] in [train_list[str(self.date)][x] for x in self.traincode.split(',')]:
+                    else:
+                        train_valid = [train_list[str(self.date)][x] for x in self.traincode.split(',') if x in train_list[str(self.date)]]
+                        if not train_valid:
+                            raise TrainQueryError(u'车次不存在，或日期不在预售期内')
+                        if not data['train_no'] in train_valid:
                             continue
-                    except KeyError:
-                        raise TrainQueryError(u'车次不存在，或日期不在预售期内')
             except IndexError:
                 raise
 

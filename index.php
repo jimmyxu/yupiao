@@ -5,7 +5,7 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', mktime(0, 0, 0) + 24 * 60 * 60 - 1
 $dates = '';
 $options = '';
 setlocale(LC_TIME, 'zh_CN.UTF-8');
-for ($i = 0; $i <= 60; $i++) {
+for ($i = 0; $i <= 59; $i++) {
     $offset = time() + $i * 24 * 60 * 60;
     $dates .= date('Y-m-d', $offset) . ',';
     if (($i == @$_GET['D']) || (strftime('%m-%d', $offset) === @$_GET['T'])) {

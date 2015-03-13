@@ -1,4 +1,4 @@
-var DAYS_FORWARD = 60;
+var DAYS_FORWARD = 59;
 function init() {
 	if(parseInt(!!($('#FZ')[0].value) + !!($('#DZ')[0].value) + !!$('#TC')[0].value) >= 2) {// 会不会导致兼容性问题？
 		YP.doYpQuery();
