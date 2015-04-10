@@ -80,9 +80,12 @@ class TrainQuery:
                         if not data['station_train_code'][0] in self.traincode:
                             continue
                     else:
-                        train_valid = [train_list[str(self.date)][x] for x in self.traincode.split(',') if x in train_list[str(self.date)]]
+                        try:
+                            train_valid = [train_list[str(self.date)][x] for x in self.traincode.split(',') if x in train_list[str(self.date)]]
+                        except KeyError:
+                            raise TrainQueryError(u'日期不在预售期内')
                         if not train_valid:
-                            raise TrainQueryError(u'车次不存在，或日期不在预售期内')
+                            raise TrainQueryError(u'车次不存在')
                         if not data['train_no'] in train_valid:
                             continue
             except IndexError:
