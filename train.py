@@ -52,9 +52,17 @@ t = r.json()['data']['data']
 stop = {}
 stops = []
 station_no = 1
+extra_day = 0
+time_last = datetime.datetime.strptime(t[0]['start_time'], '%H:%M')
 for data in t:
+    time_this = datetime.datetime.strptime(data['start_time'], '%H:%M')
+    extra_day += -(time_this - time_last).days
+    time_last = time_this
     stops += [data['station_name']]
-    stop[data['station_name']] = {'seq': station_no}
+    stop[data['station_name']] = {
+            'seq': station_no,
+            'extra_day': extra_day,
+    }
     station_no += 1
 
 train = {'stops': stops, 'stop': stop}

@@ -138,7 +138,7 @@ var YP = window.YP = YP || {};
 					var endi = train.stop[DZ] ? train.stop[DZ].seq - 1 : train.stops.length - 1;
 					for(var i = 0; i < endi; i++) {
 						var pos = $('<div></div>').attr('id', 'result' + i).appendTo($('#query_canvas'));
-						singleQuery(train.stops[i], DZ, TC, dates[DT], i, pos);
+						singleQuery(train.stops[i], DZ, TC, dates[DT + train.stop[train.stops[i]]['extra_day']], i, pos);
 					}
 				}
 			}
