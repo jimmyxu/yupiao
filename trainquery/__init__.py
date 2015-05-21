@@ -101,7 +101,8 @@ class TrainQuery:
                 data['start_time'], data['arrive_time'], data['lishi'],
                 w(data['swz_num']), w(data['tz_num']), w(data['zy_num']), w(data['ze_num']),
                 w(data['gr_num']), w(data['rw_num']), w(data['yw_num']),
-                w(data['rz_num']), w(data['yz_num']), w(data['wz_num']), w(data['qt_num']),]
+                w(data['rz_num']), w(data['yz_num']), w(data['wz_num']), w(data['qt_num']),
+                data['note'].replace(u'<br/>', ''),]
 
             if ((self.fztc or data['from_station_telecode'] == self.fz) and
                 (self.dztc or data['to_station_telecode'] == self.dz)):

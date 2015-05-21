@@ -7,7 +7,7 @@ import email.header
 import json
 import os
 import traceback
-from trainquery import TrainQuery, TrainQueryError, qssj
+from trainquery import TrainQuery, TrainQueryError
 
 def getdj(traincode):
     dj = {u'G': u'高速',
@@ -22,16 +22,6 @@ def getdj(traincode):
     dj.update([(unicode(i), u'普客') for i in xrange(6, 9)])
 
     return dj.get(traincode[0], u'--')
-
-def getqssj(fz, traincode):
-    if traincode[0] in u'CD':
-        return u'11:00'
-    elif traincode[0] in u'G':
-        return u'14:00'
-    try:
-        return qssj.qssj[fz]
-    except KeyError:
-        return u'null'
 
 form = cgi.FieldStorage()
 
@@ -80,8 +70,6 @@ for i in sorted(result.keys()):
     other = u''
     rz = r[13] if r[13] != u'--' else r[8]
     yz = r[14] if r[14] != u'--' else r[9]
-    if u'*' in r[11] + r[12] + rz + yz + r[15]:
-        other += u'%s起售 ' % getqssj(r[1], r[0])
     if r[6] != u'--':
         other += u'商务:%s ' % r[6]
     if r[7] != u'--':
@@ -90,6 +78,8 @@ for i in sorted(result.keys()):
         other += u'高软:%s ' % r[10]
     if r[16] != u'--':
         other += u'其他:%s' % r[16]
+    if r[17]:
+        other += r[17]
     # 日期,#,车次,发站,到站,出发,到达,历时,软卧,硬卧,软座,硬座,其他,无座,等级
     data += u'%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s;' % (
             date, # 日期
