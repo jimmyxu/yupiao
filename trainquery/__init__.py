@@ -97,11 +97,26 @@ class TrainQuery:
             except KeyError:
                 tq = text[1]
 
+            rw_num = w(data['rw_num'])
+            gr_num = w(data['gr_num'])
+            ze_num = w(data['ze_num'])
+
+            if u'有' in rw_num + gr_num + ze_num:
+                yp_info = data['yp_info']
+                for i in xrange(0, len(yp_info) / 10):
+                    if yp_info[i*10] == u'A': # 高级软卧
+                        gr_num = unicode(int(yp_info[i*10 + 6:i*10 + 10]))
+                    elif yp_info[i*10] == u'O': # 二等座
+                        ze_num = unicode(int(yp_info[i*10 + 6:i*10 + 10]))
+                    elif yp_info[i*10] == u'F': # 软卧
+                        rw_num = unicode(int(yp_info[i*10 + 6:i*10 + 10]))
+
             text = [count, tq, data['from_station_name'], data['to_station_name'],
                 data['start_time'], data['arrive_time'], data['lishi'],
-                w(data['swz_num']), w(data['tz_num']), w(data['zy_num']), w(data['ze_num']),
-                w(data['gr_num']), w(data['rw_num']), w(data['yw_num']),
-                w(data['rz_num']), w(data['yz_num']), w(data['wz_num']), w(data['qt_num']),
+                w(data['swz_num']), w(data['tz_num']), w(data['zy_num']),
+                ze_num, gr_num, rw_num,
+                w(data['yw_num']), w(data['rz_num']), w(data['yz_num']),
+                w(data['wz_num']), w(data['qt_num']),
                 data['note'].replace(u'<br/>', ''),]
 
             if ((self.fztc or data['from_station_telecode'] == self.fz) and
