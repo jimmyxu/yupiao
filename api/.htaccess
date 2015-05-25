@@ -1,7 +1,7 @@
 Require expr %{req:X-Requested-With} == 'XMLHttpRequest'
 
 RewriteEngine on
-RewriteBase /~jimmy/yp/api/
+RewriteBase /api/
 RewriteRule ^yp/([^-]+)-([^-]+)-([^/]*)/([0-9-]+)$ ../yp.py?fz=$1&dz=$2&date=$4&train=$3 [L,QSA]
 RewriteRule ^train/([^/]+)/(.+)$ ../train.py?train=$1&date=$2 [L]
 
