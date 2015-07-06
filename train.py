@@ -56,12 +56,15 @@ extra_day = 0
 time_last = datetime.datetime.strptime(t[0]['start_time'], '%H:%M')
 for data in t:
     time_this = datetime.datetime.strptime(data['start_time'], '%H:%M')
+    dep_h, dep_m = [int(x) for x in data['start_time'].split(':')]
+    dep_time = dep_h * 60 + dep_m
     extra_day += -(time_this - time_last).days
     time_last = time_this
     stops += [data['station_name']]
     stop[data['station_name']] = {
             'seq': station_no,
             'extra_day': extra_day,
+            'dep_time': dep_time
     }
     station_no += 1
 
@@ -69,4 +72,3 @@ train = {'stops': stops, 'stop': stop}
 
 print
 print json.dumps(train).encode('utf-8')
-

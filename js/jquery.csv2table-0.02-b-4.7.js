@@ -101,7 +101,7 @@
 			where              : null,                             //array of where : [{'ColName':'condition'}] etc.
 			limit              : null,                             //array of limit : [offset,len]
 			col0color          : true,                             //col[0] color sync jQchart line_strokeStyle
-			numArignRight      : true,                             //Set the Number TD to "textAlign : 'right'"
+			numArignRight      : false,                             //Set the Number TD to "textAlign : 'right'"
 			onload             : null,                             //collback function (id,op,data,ary) {}
 			use                : null,                             // 'jqchart:line#canvasID'
 			className_div      : 'csv2table-div',                  //className
