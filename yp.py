@@ -81,7 +81,7 @@ for i in sorted(result.keys()):
     if r[17]:
         other += r[17]
     # 日期,#,车次,发站,到站,出发,到达,历时,软卧,硬卧,软座,硬座,其他,无座,等级
-    data += u'%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s;' % (
+    data += u'%s,%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s|' % (
             date, # 日期
             i, # #
             r[0], # 车次

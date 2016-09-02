@@ -111,13 +111,17 @@ class TrainQuery:
                     elif yp_info[i*10] == u'F': # 软卧
                         rw_num = unicode(int(yp_info[i*10 + 6:i*10 + 10]))
 
+            note = data['note']
+            if 'controlled_train_flag' in data and data['controlled_train_flag'] == '1':
+                note = data['controlled_train_message']
+
             text = [count, tq, data['from_station_name'], data['to_station_name'],
                 data['start_time'], data['arrive_time'], data['lishi'],
                 w(data['swz_num']), w(data['tz_num']), w(data['zy_num']),
                 ze_num, gr_num, rw_num,
                 w(data['yw_num']), w(data['rz_num']), w(data['yz_num']),
                 w(data['wz_num']), w(data['qt_num']),
-                data['note'].replace(u'<br/>', ''),]
+                note.replace(u'<br/>', '').replace(',', '&#44;'),]
 
             if ((self.fztc or data['from_station_telecode'] == self.fz) and
                 (self.dztc or data['to_station_telecode'] == self.dz)):

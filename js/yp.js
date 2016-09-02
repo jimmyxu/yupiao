@@ -207,7 +207,7 @@ var YP = window.YP = YP || {};
 			pos.html("");
 
 			var csvlines = [];
-			var lines = data.data.split(';');
+			var lines = data.data.split('|');
 			$.each(lines, function(i, line) {
                 if(line == '') return;
 				if(queryMode == 'enum') {
